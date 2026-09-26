@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>球球手帳</title>
+  <meta name="description" content="手寫、貼紙、照片拼貼、旅行印章收藏的日記手帳">
+  <meta name="theme-color" content="#fff6ee">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="球球手帳">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ========== 首頁 ========== -->
+    <section class="view" id="view-home">
+      <header class="top">
+        <div>
+          <div class="hello" id="hello">嗨！</div>
+          <div class="today-label" id="todayLabel"></div>
+        </div>
+        <div class="top-right">
+          <button class="cloud-badge hidden" id="cloudBadge" title="雲端同步"></button>
+          <div class="streak" id="streak" title="連續寫日記天數">🔥 <b>0</b> 天</div>
+        </div>
+      </header>
+
+      <div class="scroll">
+        <div class="card today-card" id="todayCard"></div>
+
+        <div class="card prompt-card">
+          <div class="card-title">💭 今天可以寫寫看</div>
+          <div class="prompt" id="promptText"></div>
+          <button class="link-btn" id="promptNext">換一個</button>
+        </div>
+
+        <div class="card memory-card hidden" id="memoryCard"></div>
+
+        <div class="section-title">最近的頁面</div>
+        <div class="thumb-grid" id="recentGrid"></div>
+      </div>
+    </section>
+
+    <!-- ========== 日記本（月曆） ========== -->
+    <section class="view hidden" id="view-book">
+      <header class="top">
+        <button class="icon-btn" id="monthPrev" aria-label="上個月">‹</button>
+        <div class="month-title" id="monthTitle"></div>
+        <button class="icon-btn" id="monthNext" aria-label="下個月">›</button>
+      </header>
+      <div class="scroll">
+        <div class="calendar" id="calendar"></div>
+        <div class="section-title">這個月的頁面</div>
+        <div class="thumb-grid" id="monthGrid"></div>
+      </div>
+    </section>
+
+    <!-- ========== 旅行列表 ========== -->
+    <section class="view hidden" id="view-trips">
+      <header class="top">
+        <div class="page-title">✈️ 我的旅行</div>
+        <button class="pill-btn" id="newTripBtn">＋ 新旅行</button>
+      </header>
+      <div class="scroll">
+        <div class="trip-list" id="tripList"></div>
+      </div>
+    </section>
+
+    <!-- ========== 單一旅行 ========== -->
+    <section class="view hidden" id="view-trip">
+      <header class="top">
+        <button class="icon-btn" id="tripBack" aria-label="返回">‹</button>
+        <div class="page-title" id="tripTitle"></div>
+        <button class="icon-btn" id="tripEdit" aria-label="編輯旅行">✎</button>
+      </header>
+      <div class="scroll">
+        <div class="trip-hero" id="tripHero"></div>
+        <div class="seg" id="tripTabs">
+          <button data-tab="album" class="on">🏷️ 收藏冊</button>
+          <button data-tab="pages">📔 旅行日記</button>
+        </div>
+        <div id="tripAlbum">
+          <div class="chips" id="colFilter"></div>
+          <button class="big-add" id="addCollectible">📸 拍下紀念章 / 收據 / 票根</button>
+          <div class="album" id="albumGrid"></div>
+        </div>
+        <div id="tripPages" class="hidden">
+          <div class="row-btns">
+            <button class="pill-btn" id="tripNewPage">＋ 新增一頁</button>
+            <button class="pill-btn ghost" id="tripAllDays">為每一天建立頁面</button>
+          </div>
+          <div class="thumb-grid" id="tripPageGrid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 設定 ========== -->
+    <section class="view hidden" id="view-settings">
+      <header class="top"><div class="page-title">⚙️ 設定</div></header>
+      <div class="scroll">
+        <div class="card" id="syncCard"></div>
+
+        <div class="card">
+          <div class="card-title">⏰ 每天提醒我寫日記</div>
+          <p class="muted">網頁 App 沒辦法自己跳通知，所以改用「加到行事曆」：下載後按「加入」，iPhone、iPad、Mac 都會在同一時間提醒你（透過 iCloud 行事曆同步）。</p>
+          <div class="row">
+            <label>提醒時間 <input type="time" id="remindTime" value="21:30"></label>
+            <button class="pill-btn" id="remindBtn">加到行事曆</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">✍️ 手寫</div>
+          <label class="switch-row">
+            <span>只用 Apple Pencil 畫圖<br><small class="muted">開啟後手指只用來捲動，手掌碰到螢幕也不會畫到。第一次用筆寫字時會自動開啟。</small></span>
+            <input type="checkbox" id="pencilOnly">
+          </label>
+        </div>
+
+        <div class="card">
+          <div class="card-title">💾 備份檔</div>
+          <p class="muted">多一層保險：把所有日記打包成一個檔案，存到 iCloud 雲碟或電腦裡。就算雲端出問題，也能用「匯入」救回來。建議每個月匯出一次。</p>
+          <div class="row">
+            <button class="pill-btn" id="exportBtn">匯出備份檔</button>
+            <button class="pill-btn ghost" id="importBtn">匯入備份檔</button>
+            <input type="file" id="importFile" accept=".json,application/json" hidden>
+          </div>
+          <div class="muted small" id="lastBackup"></div>
+          <div class="muted small" id="storageInfo"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📱 安裝到主畫面</div>
+          <p class="muted"><b>iPhone / iPad：</b>用 Safari 打開 → 點「分享」→「加入主畫面」。<br><b>Mac：</b>用 Safari 打開 → 選單「檔案」→「加入 Dock」。<br>安裝後沒網路也能寫。</p>
+        </div>
+        <p class="muted small center">球球手帳 · 日記存在你的裝置和你自己的 Firebase，只有你看得到</p>
+      </div>
+    </section>
+
+    <!-- ========== 手帳編輯器 ========== -->
+    <section class="view hidden" id="view-editor">
+      <header class="ed-top">
+        <button class="icon-btn" id="edBack" aria-label="返回">‹</button>
+        <button class="ed-date" id="edDate"></button>
+        <div class="ed-top-right">
+          <button class="icon-btn" id="edMood" aria-label="心情">😊</button>
+          <button class="icon-btn" id="edPaper" aria-label="紙張">📄</button>
+          <button class="icon-btn" id="edUndo" aria-label="復原">↶</button>
+          <button class="icon-btn" id="edRedo" aria-label="重做">↷</button>
+          <button class="icon-btn" id="edMore" aria-label="更多">⋯</button>
+        </div>
+      </header>
+
+      <div class="stage" id="stage">
+        <div class="page-wrap" id="pageWrap">
+          <div class="page" id="page">
+            <canvas id="paperCanvas"></canvas>
+            <div id="itemsLayer"></div>
+            <canvas id="inkCanvas"></canvas>
+            <div id="selBox" class="hidden">
+              <div class="sel-handle rot" data-h="rot" title="拖曳：旋轉＋縮放"></div>
+              <div class="sel-handle del" data-h="del" title="刪除">✕</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ed-options" id="edOptions"></div>
+
+      <nav class="ed-tools" id="edTools">
+        <button data-tool="select" title="選取／移動">👆<span>移動</span></button>
+        <button data-tool="pen" class="on" title="鋼筆">🖊️<span>寫字</span></button>
+        <button data-tool="brush" title="畫筆">🖌️<span>畫畫</span></button>
+        <button data-tool="highlighter" title="螢光筆">🖍️<span>螢光筆</span></button>
+        <button data-tool="eraser" title="橡皮擦">🧽<span>橡皮擦</span></button>
+        <i class="sep"></i>
+        <button data-add="sticker" title="貼紙">⭐<span>貼紙</span></button>
+        <button data-add="photo" title="照片">🖼️<span>照片</span></button>
+        <button data-add="text" title="打字">🔤<span>打字</span></button>
+      </nav>
+      <input type="file" id="photoInput" accept="image/*" multiple hidden>
+    </section>
+
+    <!-- ========== 底部分頁 ========== -->
+    <nav class="tabbar" id="tabbar">
+      <button data-view="home" class="on">🏠<span>今天</span></button>
+      <button data-view="book">📅<span>日記本</span></button>
+      <button data-view="trips">✈️<span>旅行</span></button>
+      <button data-view="settings">⚙️<span>設定</span></button>
+    </nav>
+  </div>
+
+  <!-- 底部彈出面板（共用） -->
+  <div class="sheet-backdrop hidden" id="sheetBackdrop"></div>
+  <div class="sheet hidden" id="sheet">
+    <div class="sheet-grip"></div>
+    <div class="sheet-body" id="sheetBody"></div>
+  </div>
+
+  <div class="toast hidden" id="toast"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
